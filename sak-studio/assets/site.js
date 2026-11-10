@@ -8,7 +8,17 @@
 
   window.__sakBoot = true;
 
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* 紧急开关：任意页面加 ?nomotion=1 立刻关掉全部动效（无需改文件） */
+  if (/[?&]nomotion=1/.test(location.search)) {
+    var kill = document.createElement('style');
+    kill.textContent = '*,*::before,*::after{animation:none!important;transition:none!important}'
+      + '.rv,.split-line{opacity:1!important;transform:none!important}';
+    document.head.appendChild(kill);
+    document.documentElement.classList.add('no-motion');
+  }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    || document.documentElement.classList.contains('no-motion');
 
   /* 兜底：任何脚本异常都把内容显示出来，绝不让页面空着 */
   window.addEventListener('error', function () {
@@ -178,4 +188,165 @@
   document.querySelectorAll('[data-year]').forEach(function (el) {
     el.textContent = new Date().getFullYear();
   });
+})();
+
+/* ==========================================================================
+   MOTION SYSTEM v2 · 行为层
+   进度条 / 导航状态 / 按钮涟漪 / 卡片倾斜 / 分组错峰 / 表单反馈
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 1. 滚动进度条 */
+  (function () {
+    var bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bar);
+    var raf = 0;
+    function update() {
+      raf = 0;
+      var h = document.documentElement.scrollHeight - innerHeight;
+      var p = h > 0 ? Math.min(1, Math.max(0, scrollY / h)) : 0;
+      bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    }
+    addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    update();
+  })();
+
+  /* 2. 导航滚动收缩 */
+  (function () {
+    var nav = document.querySelector('.nav');
+    if (!nav) return;
+    var raf = 0;
+    function update() {
+      raf = 0;
+      nav.classList.toggle('is-scrolled', scrollY > 40);
+    }
+    addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    update();
+  })();
+
+  /* 3. 菜单：同步 nav 状态（图标旋转） */
+  (function () {
+    var btn = document.getElementById('menuBtn');
+    var nav = document.querySelector('.nav');
+    if (!btn || !nav) return;
+    new MutationObserver(function () {
+      nav.classList.toggle('is-open', btn.getAttribute('aria-expanded') === 'true');
+    }).observe(btn, { attributes: true, attributeFilter: ['aria-expanded'] });
+  })();
+
+  /* 4. 按钮：指针光晕 + 点击涟漪 */
+  (function () {
+    document.querySelectorAll('.btn').forEach(function (btn) {
+      btn.addEventListener('pointermove', function (e) {
+        var r = btn.getBoundingClientRect();
+        btn.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        btn.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+      btn.addEventListener('pointerleave', function () {
+        btn.style.removeProperty('--mx');
+        btn.style.removeProperty('--my');
+      });
+      btn.addEventListener('click', function (e) {
+        if (reduce) return;
+        var r = btn.getBoundingClientRect();
+        var d = Math.max(r.width, r.height) * 2;
+        var s = document.createElement('span');
+        s.className = 'ripple';
+        s.style.width = s.style.height = d + 'px';
+        s.style.left = (e.clientX - r.left) + 'px';
+        s.style.top = (e.clientY - r.top) + 'px';
+        s.addEventListener('animationend', function () { s.remove(); });
+        btn.appendChild(s);
+      });
+    });
+  })();
+
+  /* 5. 卡片 3D 倾斜（仅指针设备，强度很小，避免晕） */
+  (function () {
+    if (reduce || window.matchMedia('(hover:none)').matches) return;
+    document.querySelectorAll('.work').forEach(function (card) {
+      var media = card.querySelector('.work__media');
+      if (!media) return;
+      var raf = 0, tx = 0, ty = 0;
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        tx = ((e.clientX - r.left) / r.width - .5) * 6;   // ±3deg
+        ty = ((e.clientY - r.top) / r.height - .5) * -6;
+        if (!raf) raf = requestAnimationFrame(function () {
+          raf = 0;
+          media.style.transform = 'perspective(900px) rotateY(' + tx.toFixed(2) + 'deg) rotateX(' + ty.toFixed(2) + 'deg)';
+        });
+      });
+      card.addEventListener('pointerleave', function () {
+        media.style.transform = '';
+      });
+    });
+  })();
+
+  /* 6. 分组错峰：给容器子元素排队（不写进 HTML，保持模板干净） */
+  (function () {
+    document.querySelectorAll('.works, .svc, .steps, .stats').forEach(function (box) {
+      Array.prototype.forEach.call(box.children, function (child, i) {
+        if (i > 5) return;
+        child.style.transitionDelay = (i * 60) + 'ms';
+      });
+    });
+  })();
+
+  /* 7. 表单：校验 + 反馈 + 邮件兜底 */
+  (function () {
+    var form = document.querySelector('form[data-contact]');
+    if (!form) return;
+    var ok = form.querySelector('.form-ok');
+    var okText = form.querySelector('.form-ok-text');
+    var submit = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var fields = form.querySelectorAll('input, textarea');
+      var bad = null;
+      fields.forEach(function (f) {
+        var invalid = f.required && !String(f.value).trim();
+        if (f.type === 'email' && f.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value)) invalid = true;
+        f.classList.toggle('invalid', invalid);
+        if (invalid && !bad) bad = f;
+      });
+
+      if (bad) {
+        bad.closest('.field').classList.add('shake');
+        setTimeout(function () { bad.closest('.field').classList.remove('shake'); }, 360);
+        bad.focus();
+        return;
+      }
+
+      var name = (form.querySelector('[name="name"]') || {}).value || '';
+      var mail = (form.querySelector('[name="email"]') || {}).value || '';
+      var msg = (form.querySelector('[name="message"]') || {}).value || '';
+      var subject = encodeURIComponent('SAK 工作室 · 合作咨询（' + name + '）');
+      var body = encodeURIComponent('称呼：' + name + '\n邮箱：' + mail + '\n\n想做什么：\n' + msg);
+      var mailto = 'mailto:318718579@qq.com?subject=' + subject + '&body=' + body;
+
+      if (submit) { submit.disabled = true; submit.style.opacity = '.6'; }
+      if (okText) {
+        okText.innerHTML = '已收到，我们会尽快回信。也可以直接发到 ' +
+          '<a href="' + mailto + '">318718579@qq.com</a>';
+      }
+      if (ok) ok.classList.add('show');
+      fields.forEach(function (f) { f.classList.remove('invalid'); });
+      form.reset();
+      if (submit) setTimeout(function () { submit.disabled = false; submit.style.opacity = ''; }, 1200);
+    });
+
+    form.addEventListener('input', function (e) {
+      if (e.target.classList && e.target.classList.contains('invalid') && e.target.value.trim()) {
+        e.target.classList.remove('invalid');
+      }
+    });
+  })();
 })();
