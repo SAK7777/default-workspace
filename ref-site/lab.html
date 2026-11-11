@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实验室 ｜ SAK 工作室</title>
+<meta name="description" content="SAK 实验室 —— WebGL 与交互实验。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300..700&family=Zalando+Sans+SemiExpanded:wght@200..900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--ink:#f2f0ec;--dim:rgba(242,240,236,.5);--line:rgba(242,240,236,.18);--accent:#d9a441;
+  --sans:'DM Sans','PingFang SC','Microsoft YaHei',sans-serif;--disp:'Zalando Sans SemiExpanded','DM Sans',Helvetica,Arial,sans-serif;--pad:2.5rem}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;cursor:none;-webkit-font-smoothing:antialiased}
+@media(pointer:coarse){body{cursor:auto}}
+a{color:inherit;text-decoration:none}
+canvas{position:fixed;inset:0;display:block;z-index:0}
+.bg-noise{position:fixed;inset:0;z-index:9998;opacity:.055;pointer-events:none;mix-blend-mode:screen;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.nav{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;height:52px;padding:0 8px;min-width:300px;background:rgba(10,10,10,.72);border:1px solid rgba(242,240,236,.12);border-radius:8px;backdrop-filter:blur(14px)}
+.nav .n-ico,.nav .n-menu{width:44px;height:38px;display:grid;place-items:center;border-radius:6px;transition:background .24s,color .24s}
+.nav .n-ico:hover,.nav .n-menu:hover{background:rgba(242,240,236,.1);color:var(--accent)}
+.nav .n-logo{flex:1;display:grid;place-items:center}
+.nav .n-logo img{height:24px;width:auto}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.4}
+.overlay{position:fixed;inset:0;z-index:5;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(52px + 3rem) var(--pad) 2rem}
+.top h1{font-family:var(--disp);font-weight:600;font-size:clamp(40px,9vw,132px);line-height:.82;letter-spacing:-.05em;text-transform:uppercase;mix-blend-mode:difference}
+.top .k{margin-top:1.2rem;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;font-size:11px;line-height:1.8;color:var(--dim)}
+.bottom .hint{max-width:34ch}
+.ctrls{display:flex;gap:10px;pointer-events:auto}
+.ctrls button{all:unset;cursor:pointer;padding:10px 16px;border:1px solid var(--line);border-radius:999px;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);
+  transition:background .24s,color .24s,border-color .24s}
+.ctrls button:hover{background:var(--ink);color:#080808;border-color:var(--ink)}
+.ctrls button.on{background:var(--accent);border-color:var(--accent);color:#080808}
+#cursor-dot,#cursor-ring{position:fixed;left:0;top:0;z-index:9999;border-radius:50%;pointer-events:none;mix-blend-mode:difference}
+#cursor-dot{width:6px;height:6px;background:#fff;transform:translate(-50%,-50%)}
+#cursor-ring{width:38px;height:38px;border:1px solid rgba(255,255,255,.6);transform:translate(-50%,-50%);transition:width .25s,height .25s}
+#cursor-ring.grow{width:64px;height:64px;border-color:#fff}
+@media(max-width:900px){:root{--pad:1.25rem}.overlay{padding-top:calc(52px + 2rem)}.bottom{flex-direction:column;align-items:flex-start}}
+@media (prefers-reduced-motion:reduce){.bg-noise{display:none}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="bg-noise" aria-hidden="true"></div>
+<div id="cursor-dot" aria-hidden="true"></div><div id="cursor-ring" aria-hidden="true"></div>
+
+<nav class="nav">
+  <a class="n-ico" href="mailto:318718579@qq.com" aria-label="邮件"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 8l9 6 9-6"/></svg></a>
+  <a class="n-logo" href="index.html" aria-label="SAK 工作室"><img src="assets/img/logo-s.svg" alt="SAK"></a>
+  <button class="n-menu" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16"/></svg></button>
+</nav>
+
+<div class="overlay">
+  <div class="top">
+    <h1>LAB</h1>
+    <div class="k">WebGL 交互实验 · 拖动改变形态</div>
+  </div>
+  <div class="bottom">
+    <p class="hint">鼠标移动改变扭曲强度，点击切换线框 / 实体。这页用 three.js 重写。</p>
+    <div class="ctrls">
+      <button data-mode="wire" class="on">线框</button>
+      <button data-mode="solid">实体</button>
+      <button data-mode="reset">重置</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var canvas = document.getElementById('gl');
+  if (!window.THREE) { document.body.style.background = '#080808'; return; }
+
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x080808, 0.055);
+
+  var camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 7);
+
+  var wireMat = new THREE.MeshBasicMaterial({ color: 0xf2f0ec, wireframe: true, transparent: true, opacity: .55 });
+  var solidMat = new THREE.MeshStandardMaterial({ color: 0x151515, metalness: .9, roughness: .35, flatShading: true });
+
+  var knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.5, .42, 220, 24, 2, 3), wireMat);
+  scene.add(knot);
+
+  scene.add(new THREE.AmbientLight(0xffffff, .25));
+  var key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(4, 6, 6); scene.add(key);
+  var rim = new THREE.PointLight(0xd9a441, 1.6, 18); rim.position.set(-5, -3, 3); scene.add(rim);
+
+  // 粒子星域
+  var N = 900, pos = new Float32Array(N * 3);
+  for (var i = 0; i < N; i++) {
+    pos[i*3] = (Math.random() - .5) * 26;
+    pos[i*3+1] = (Math.random() - .5) * 16;
+    pos[i*3+2] = (Math.random() - .5) * 26;
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  var stars = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8a8a8a, size: .035, transparent: true, opacity: .8 }));
+  scene.add(stars);
+
+  var mx = 0, my = 0, tx = 0, ty = 0, twist = 0, target = 0;
+  addEventListener('pointermove', function (e) {
+    tx = (e.clientX / innerWidth - .5) * 2;
+    ty = (e.clientY / innerHeight - .5) * 2;
+    target = Math.abs(tx) * .5 + Math.abs(ty) * .3;
+  });
+  addEventListener('resize', function () {
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  var mode = 'wire';
+  document.querySelectorAll('.ctrls button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var m = b.getAttribute('data-mode');
+      if (m === 'reset') { knot.scale.set(1,1,1); twist = 0; return; }
+      mode = m;
+      knot.material = m === 'solid' ? solidMat : wireMat;
+      document.querySelectorAll('.ctrls button').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+    });
+  });
+
+  var t0 = performance.now();
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    var t = (now - t0) / 1000;
+
+    mx += (tx - mx) * .05; my += (ty - my) * .05;
+    twist += (target - twist) * .05;
+
+    knot.rotation.x = t * .22 + my * .6;
+    knot.rotation.y = t * .31 + mx * .9;
+    knot.scale.setScalar(1 + twist * .25);
+
+    stars.rotation.y = t * .02;
+    camera.position.x = mx * .6;
+    camera.position.y = -my * .4;
+    camera.lookAt(0, 0, 0);
+
+    rim.intensity = 1.2 + Math.sin(t * 1.4) * .5;
+    renderer.render(scene, camera);
+  })(t0);
+
+  // 光标
+  var dot = document.getElementById('cursor-dot'), ring = document.getElementById('cursor-ring');
+  if (dot && !matchMedia('(pointer:coarse)').matches) {
+    var x = innerWidth/2, y = innerHeight/2, rx = x, ry = y;
+    addEventListener('pointermove', function (e) {
+      x = e.clientX; y = e.clientY;
+      dot.style.transform = 'translate(' + (x-3) + 'px,' + (y-3) + 'px)';
+    });
+    (function l() { rx += (x-rx)*.16; ry += (y-ry)*.16; ring.style.transform = 'translate(' + (rx-19) + 'px,' + (ry-19) + 'px)'; requestAnimationFrame(l); })();
+    document.querySelectorAll('a,button').forEach(function (n) {
+      n.addEventListener('pointerenter', function () { ring.classList.add('grow'); });
+      n.addEventListener('pointerleave', function () { ring.classList.remove('grow'); });
+    });
+  }
+})();
+</script>
+</body>
+</html>

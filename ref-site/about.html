@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关于 ｜ SAK 工作室</title>
+<meta name="description" content="SAK 工作室 —— 中国上海，做餐饮与生活品牌的数字体验。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000&family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--ink:#f2f0ec;--dim:rgba(242,240,236,.55);--line:rgba(242,240,236,.22);--accent:#d9a441;
+  --sans:'DM Sans','PingFang SC','Microsoft YaHei',sans-serif;--disp:'Zalando Sans SemiExpanded','DM Sans',Helvetica,Arial,sans-serif;--pad:2.5rem}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased}
+@media(pointer:coarse){body{cursor:auto}#cursor-dot,#cursor-ring{display:none}}
+a{color:inherit;text-decoration:none}img{display:block;width:100%;height:100%;object-fit:cover}
+.bg-noise{position:fixed;inset:0;z-index:9998;opacity:.055;pointer-events:none;mix-blend-mode:screen;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#cursor-dot,#cursor-ring{position:fixed;left:0;top:0;z-index:9999;border-radius:50%;pointer-events:none;mix-blend-mode:difference}
+#cursor-dot{width:6px;height:6px;background:#fff;transform:translate(-50%,-50%)}
+#cursor-ring{width:38px;height:38px;border:1px solid rgba(255,255,255,.6);transform:translate(-50%,-50%);transition:width .25s,height .25s}
+#cursor-ring.grow{width:64px;height:64px;border-color:#fff}
+.nav{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;height:52px;padding:0 8px;min-width:300px;background:rgba(10,10,10,.72);border:1px solid rgba(242,240,236,.12);border-radius:8px;backdrop-filter:blur(14px)}
+.nav .n-ico,.nav .n-menu{width:44px;height:38px;display:grid;place-items:center;border-radius:6px;transition:background .24s,color .24s}
+.nav .n-ico:hover,.nav .n-menu:hover{background:rgba(242,240,236,.1);color:var(--accent)}
+.nav .n-logo{flex:1;display:grid;place-items:center}
+.nav .n-logo img{height:24px;width:auto}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.4}
+
+/* 滚动黏附视口 */
+.scene{position:relative}
+.sticky{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+.sticky .stage{position:relative;width:100%;height:100%;display:grid;place-items:center}
+.sticky h1{font-family:var(--disp);font-weight:600;font-size:clamp(44px,12vw,168px);line-height:.84;
+  letter-spacing:-.05em;text-transform:uppercase;text-align:center;mix-blend-mode:difference;z-index:3}
+.sticky .ring{position:absolute;width:min(46vh,46vw);aspect-ratio:1;border:1px solid var(--line);border-radius:50%;z-index:1}
+.sticky .ring:nth-child(2){width:min(62vh,62vw)}
+.sticky .cap{position:absolute;bottom:12vh;left:var(--pad);font-size:11px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+.sticky .cap-r{position:absolute;bottom:12vh;right:var(--pad);font-size:11px;letter-spacing:.14em;color:var(--dim)}
+
+/* 段落 */
+.block{padding:clamp(4rem,10vh,9rem) var(--pad);border-top:1px solid var(--line)}
+.block .k{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:1.4rem}
+.block h2{font-family:var(--disp);font-weight:500;font-size:clamp(22px,3vw,40px);line-height:1.15;letter-spacing:-.02em;max-width:22ch}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);margin-top:2.2rem}
+.cols p{font-size:13px;line-height:2;color:var(--dim);max-width:46ch}
+.cols p strong{color:var(--ink);font-weight:500}
+
+/* 能力 */
+.caps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.cap{padding:clamp(18px,2.4vw,30px);border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .3s}
+.cap:hover{background:#111}
+.cap b{display:block;font-family:var(--disp);font-size:16px;font-weight:500;margin-bottom:10px}
+.cap span{font-size:11.5px;line-height:1.8;color:var(--dim)}
+
+/* 团队名单 */
+.roster{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,40px)}
+.member .ph{aspect-ratio:3/4;background:#141414;overflow:hidden;margin-bottom:14px}
+.member img{filter:grayscale(1);transition:filter .5s,transform .8s}
+.member:hover img{filter:none;transform:scale(1.03)}
+.member h3{font-size:13px;font-weight:500;margin-bottom:4px}
+.member p{font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+
+.site-footer{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;padding:clamp(1.4rem,3vh,2rem) var(--pad) 1.8rem;border-top:1px solid var(--line);font-size:11px;line-height:1.85;color:var(--dim)}
+.site-footer .f-mid{text-align:center}
+.site-footer .f-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.site-footer a:hover{color:var(--accent)}
+.fade-up{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.fade-up.in{opacity:1;transform:none}
+@media(max-width:900px){
+  :root{--pad:1.25rem}
+  .cols,.caps,.roster{grid-template-columns:1fr}
+  .caps{grid-template-columns:1fr 1fr}
+  .site-footer{grid-template-columns:1fr}
+  .site-footer .f-right{align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fade-up{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="bg-noise" aria-hidden="true"></div>
+<div id="cursor-dot" aria-hidden="true"></div><div id="cursor-ring" aria-hidden="true"></div>
+
+<nav class="nav">
+  <a class="n-ico" href="mailto:318718579@qq.com" aria-label="邮件"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 8l9 6 9-6"/></svg></a>
+  <a class="n-logo" href="index.html" aria-label="SAK 工作室"><img src="assets/img/logo-s.svg" alt="SAK"></a>
+  <button class="n-menu" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16"/></svg></button>
+</nav>
+
+<section class="scene">
+  <div class="sticky">
+    <div class="stage">
+      <span class="ring"></span><span class="ring"></span>
+      <h1>关于<br>SAK</h1>
+      <span class="cap">EST. 2026 · SHANGHAI</span>
+      <span class="cap-r">( 品牌与数字体验 )</span>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="k">01 — 我们做什么</div>
+  <h2>把门店里的温度，翻译成可点击的秩序。</h2>
+  <div class="cols">
+    <p>SAK 是一间做<strong>餐饮与生活方式品牌</strong>的小工作室。从命名、视觉识别，到官网与门店里的每一块屏，我们把「想进去坐坐」的冲动，做成可以交付的东西。</p>
+    <p>我们不做大而全的代理：一个项目由同一个人从头跟到尾，设计、开发、影像都在同一个桌面完成。<strong>少一层转述，就少一层损耗。</strong></p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="k">02 — 能力</div>
+  <div class="caps">
+    <div class="cap"><b>核心策略规划</b><span>定位、命名、竞争与人群洞察，先把话说清楚。</span></div>
+    <div class="cap"><b>品牌识别</b><span>标志、字体、色彩与完整视觉规范。</span></div>
+    <div class="cap"><b>内容创意</b><span>菜单、物料、影像与社交内容的统一语言。</span></div>
+    <div class="cap"><b>技术趋势实践</b><span>高阶网页、动效、WebGL 与轻量交互实现。</span></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="k">03 — 团队</div>
+  <h2>一起把项目做完的人。</h2>
+  <div class="roster" style="margin-top:2.4rem">
+    <div class="member fade-up"><div class="ph"><img src="assets/img/work/w01.webp" alt=""></div><h3>SAK</h3><p>Creative Direction</p></div>
+    <div class="member fade-up"><div class="ph"><img src="assets/img/work/w04.webp" alt=""></div><h3>Lin</h3><p>Design &amp; Motion</p></div>
+    <div class="member fade-up"><div class="ph"><img src="assets/img/work/w06.webp" alt=""></div><h3>Zhou</h3><p>Engineering</p></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="f-left">策略、设计与开发。<br>快、精、价格合理。</div>
+  <div class="f-mid"><a href="mailto:318718579@qq.com">318718579@qq.com</a><br>中国上海<br>SAK 工作室 <span id="year">2026</span>©</div>
+  <div class="f-right"><a href="#">Instagram</a><a href="#">Threads</a><a href="#">Facebook</a></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+window.addEventListener('load', function () {
+  var els = document.querySelectorAll('.fade-up');
+  if (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.to(els, { opacity: 1, y: 0, duration: .9, ease: 'power3.out', stagger: .06 });
+  } else { els.forEach(function (n) { n.classList.add('in'); }); }
+});
+(function () {
+  var dot = document.getElementById('cursor-dot'), ring = document.getElementById('cursor-ring');
+  if (!dot || matchMedia('(pointer:coarse)').matches) return;
+  var x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y;
+  addEventListener('pointermove', function (e) { x = e.clientX; y = e.clientY; dot.style.transform = 'translate(' + (x - 3) + 'px,' + (y - 3) + 'px)'; });
+  (function loop() { rx += (x - rx) * .16; ry += (y - ry) * .16; ring.style.transform = 'translate(' + (rx - 19) + 'px,' + (ry - 19) + 'px)'; requestAnimationFrame(loop); })();
+})();
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
