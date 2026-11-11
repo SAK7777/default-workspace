@@ -91,9 +91,23 @@ img{display:block;width:100%;height:100%;object-fit:cover}
   .site-footer .f-right{align-items:flex-start}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fade-up{opacity:1;transform:none}}
+
+/* ===== 页面切换幕帘（复刻原站 page-transition-curtain）===== */
+.curtain{position:fixed;inset:0;z-index:9997;background:#000;pointer-events:none;
+  transform:translateY(-101%);transition:transform .55s cubic-bezier(.65,0,.35,1);will-change:transform}
+.curtain.in{transform:translateY(0);pointer-events:auto}
+body.arriving .curtain{transform:translateY(0);transition:none}
+body.arriving .curtain.out{transform:translateY(-101%);transition:transform .55s cubic-bezier(.65,0,.35,1)}
+.curtain-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:'Zalando Sans SemiExpanded',sans-serif;font-size:13px;letter-spacing:.3em;
+  color:rgba(242,240,236,.45);opacity:0;transition:opacity .3s}
+.curtain.in .curtain-mark,body.arriving .curtain .curtain-mark{opacity:1}
+
 </style>
 </head>
 <body>
+<div class="curtain" id="curtain" aria-hidden="true"><span class="curtain-mark">SAK · STUDIO</span></div>
+
 
 <div class="bg-noise" aria-hidden="true"></div>
 <div id="cursor-dot" aria-hidden="true"></div>
@@ -125,32 +139,26 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 
 <main class="work-grid">
   <a class="card fade-up" href="case-nod.html">
-    <span class="card-no">01</span>
     <img src="assets/img/work/w01.webp" alt="手拉面 · 品牌官网" loading="lazy">
     <div class="card-cap"><b>手拉面 · 品牌官网</b><span>Digital / Web</span></div>
   </a>
   <a class="card fade-up" href="case-nod.html">
-    <span class="card-no">02</span>
     <img src="assets/img/work/w03.webp" alt="灶间 · 视觉叙事" loading="lazy">
     <div class="card-cap"><b>灶间 · 视觉叙事</b><span>Branding</span></div>
   </a>
   <a class="card fade-up" href="case-nod.html">
-    <span class="card-no">03</span>
     <img src="assets/img/work/w04.webp" alt="职人 · 数字原型" loading="lazy">
     <div class="card-cap"><b>职人 · 数字原型</b><span>Digital</span></div>
   </a>
   <a class="card fade-up" href="case-nod.html">
-    <span class="card-no">04</span>
     <img src="assets/img/work/w05.webp" alt="慢制 · 门店物料" loading="lazy">
     <div class="card-cap"><b>慢制 · 门店物料</b><span>Branding</span></div>
   </a>
   <a class="card fade-up" href="case-nod.html">
-    <span class="card-no">05</span>
     <img src="assets/img/work/w06.webp" alt="一碗 · 点单界面" loading="lazy">
     <div class="card-cap"><b>一碗 · 点单界面</b><span>Web</span></div>
   </a>
   <a class="card fade-up" href="case-nod.html">
-    <span class="card-no">06</span>
     <img src="assets/img/work/w02.webp" alt="汤底 · 影像合成" loading="lazy">
     <div class="card-cap"><b>汤底 · 影像合成</b><span>Digital</span></div>
   </a>
@@ -201,5 +209,33 @@ window.addEventListener('load', function () {
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+/* 页面切换幕帘：站内跳转才播，首屏不遮挡内容 */
+(function () {
+  var c = document.getElementById('curtain');
+  if (!c) return;
+
+  if (sessionStorage.getItem('sak-nav') === '1') {
+    sessionStorage.removeItem('sak-nav');
+    document.body.classList.add('arriving');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        c.classList.add('out');
+        document.body.classList.remove('arriving');
+        setTimeout(function () { c.classList.remove('out'); }, 600);
+      });
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href$=".html"]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
+    e.preventDefault();
+    sessionStorage.setItem('sak-nav', '1');
+    c.classList.add('in');
+    setTimeout(function () { location.href = a.getAttribute('href'); }, 480);
+  });
+})();
+</script>
 </body>
 </html>

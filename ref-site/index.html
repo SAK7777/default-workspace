@@ -74,7 +74,7 @@ img{display:block}
 .car-stage img{height:100%;width:auto;object-fit:cover;opacity:.8;transition:opacity .45s,transform .7s cubic-bezier(.16,1,.3,1)}
 .car-stage img.is-on{opacity:1;transform:translateY(-4px)}
 .car-ticks{position:absolute;left:0;right:0;bottom:100%;display:flex;justify-content:center;gap:4px;margin-bottom:8px}
-.car-ticks i{width:1px;height:16px;background:rgba(242,240,236,.32)}
+.car-ticks i{width:1px;height:16px;background:rgba(242,240,236,.45)}
 .car-arrow{position:absolute;top:46%;width:30px;height:30px;display:grid;place-items:center;color:var(--dim);
   font-size:19px;line-height:1;transition:color .24s,transform .24s;z-index:4}
 .car-arrow:hover{color:var(--ink);transform:scale(1.12)}
@@ -132,9 +132,23 @@ html.no-js .fade-up{opacity:1;transform:none}
   *{animation:none!important;transition:none!important}
   .fade-up{opacity:1;transform:none}
 }
+
+/* ===== 页面切换幕帘（复刻原站 page-transition-curtain）===== */
+.curtain{position:fixed;inset:0;z-index:9997;background:#000;pointer-events:none;
+  transform:translateY(-101%);transition:transform .55s cubic-bezier(.65,0,.35,1);will-change:transform}
+.curtain.in{transform:translateY(0);pointer-events:auto}
+body.arriving .curtain{transform:translateY(0);transition:none}
+body.arriving .curtain.out{transform:translateY(-101%);transition:transform .55s cubic-bezier(.65,0,.35,1)}
+.curtain-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:'Zalando Sans SemiExpanded',sans-serif;font-size:13px;letter-spacing:.3em;
+  color:rgba(242,240,236,.45);opacity:0;transition:opacity .3s}
+.curtain.in .curtain-mark,body.arriving .curtain .curtain-mark{opacity:1}
+
 </style>
 </head>
 <body>
+<div class="curtain" id="curtain" aria-hidden="true"><span class="curtain-mark">SAK · STUDIO</span></div>
+
 
 <div class="bg-noise" aria-hidden="true"></div>
 <div id="cursor-dot" aria-hidden="true"></div>
@@ -310,6 +324,34 @@ window.addEventListener('load', function () {
 })();
 
 document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script>
+/* 页面切换幕帘：站内跳转才播，首屏不遮挡内容 */
+(function () {
+  var c = document.getElementById('curtain');
+  if (!c) return;
+
+  if (sessionStorage.getItem('sak-nav') === '1') {
+    sessionStorage.removeItem('sak-nav');
+    document.body.classList.add('arriving');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        c.classList.add('out');
+        document.body.classList.remove('arriving');
+        setTimeout(function () { c.classList.remove('out'); }, 600);
+      });
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href$=".html"]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
+    e.preventDefault();
+    sessionStorage.setItem('sak-nav', '1');
+    c.classList.add('in');
+    setTimeout(function () { location.href = a.getAttribute('href'); }, 480);
+  });
+})();
 </script>
 </body>
 </html>
