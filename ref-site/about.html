@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000&family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0a0a;--ink:#f2f0ec;--dim:rgba(242,240,236,.55);--line:rgba(242,240,236,.22);--accent:#d9a441;
+:root{--bg:#000;--ink:#f2f0ec;--dim:rgba(242,240,236,.55);--line:rgba(242,240,236,.22);--accent:#d9a441;
   --sans:'DM Sans','PingFang SC','Microsoft YaHei',sans-serif;--disp:'Zalando Sans SemiExpanded','DM Sans',Helvetica,Arial,sans-serif;--pad:2.5rem}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased}
@@ -19,7 +19,7 @@ a{color:inherit;text-decoration:none}img{display:block;width:100%;height:100%;ob
 #cursor-dot{width:6px;height:6px;background:#fff;transform:translate(-50%,-50%)}
 #cursor-ring{width:38px;height:38px;border:1px solid rgba(255,255,255,.6);transform:translate(-50%,-50%);transition:width .25s,height .25s}
 #cursor-ring.grow{width:64px;height:64px;border-color:#fff}
-.nav{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;height:52px;padding:0 8px;min-width:300px;background:rgba(10,10,10,.72);border:1px solid rgba(242,240,236,.12);border-radius:8px;backdrop-filter:blur(14px)}
+.nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;height:64px;padding:0 8px;min-width:300px;background:rgba(10,10,10,.72);border:1px solid rgba(242,240,236,.12);border-radius:8px;backdrop-filter:blur(14px)}
 .nav .n-ico,.nav .n-menu{width:44px;height:38px;display:grid;place-items:center;border-radius:6px;transition:background .24s,color .24s}
 .nav .n-ico:hover,.nav .n-menu:hover{background:rgba(242,240,236,.1);color:var(--accent)}
 .nav .n-logo{flex:1;display:grid;place-items:center}

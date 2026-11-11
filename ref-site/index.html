@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@100..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Zalando+Sans+SemiExpanded:ital,wght@0,200..900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0a0a; --ink:#f2f0ec; --dim:rgba(242,240,236,.55); --line:rgba(242,240,236,.22);
+  --bg:#000; --ink:#f2f0ec; --dim:rgba(242,240,236,.55); --line:rgba(242,240,236,.22);
   --accent:#d9a441;
   --sans:'DM Sans','PingFang SC','Microsoft YaHei',sans-serif;
   --disp:'Zalando Sans SemiExpanded','DM Sans','Helvetica Neue',Arial,sans-serif;
@@ -36,7 +36,7 @@ img{display:block}
 /* 顶部大字：STUDIO / [logo] / DIGITAL */
 .masthead{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:1vw}
 .masthead h1{
-  font-family:var(--disp);font-weight:600;font-size:clamp(40px,9.1vw,132px);
+  mix-blend-mode:difference;font-family:var(--disp);font-weight:600;font-size:clamp(40px,9.1vw,132px);
   line-height:.82;letter-spacing:-.045em;text-transform:uppercase;white-space:nowrap;
 }
 .masthead h1.is-r{text-align:right}
@@ -96,7 +96,7 @@ img{display:block}
 .stm-el{white-space:nowrap;text-transform:uppercase;font-size:clamp(9px,.72vw,12px);
   letter-spacing:.06em;line-height:1.9;color:var(--dim);transition:color .4s}
 .stm-el:hover{color:var(--ink)}
-.stm-el--xl{font-family:var(--grid);font-size:clamp(2rem,20vw,15rem);line-height:.9;color:var(--ink);text-transform:none}
+.stm-el--xl{font-family:var(--grid);font-size:clamp(2rem,20vw,15rem);line-height:.9;font-weight:400;color:var(--ink);text-transform:none;mix-blend-mode:difference}
 .stm-pos-1{margin-left:0}
 .stm-pos-2{margin-left:25vw}
 .stm-pos-3{margin-left:70vw}
